@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "car_id": 1,
+    "company": "ингосстрах",
+    "policy_type": "ОСАГО",
+    "start_date": "2012-11-26",
+    "end_date": "2026-05-11",
+    "price": 2000.0
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "car_id": 2,
+    "company": "ингосстрах",
+    "policy_type": "ОСАГО",
+    "start_date": "2021-02-23",
+    "end_date": "2026-09-25",
+    "price": 3233.0
+  }
+]

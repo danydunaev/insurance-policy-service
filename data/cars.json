@@ -1,0 +1,14 @@
+{
+  "1": {
+    "id": 1,
+    "owner_id": 1,
+    "license_plate": "Р323РР",
+    "model": "zekeer 9"
+  },
+  "2": {
+    "id": 2,
+    "owner_id": 2,
+    "license_plate": "Р233КА",
+    "model": "mersedes"
+  }
+}
