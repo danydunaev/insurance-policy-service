@@ -1,83 +1,26 @@
 """Загрузка и сохранение данных проекта в JSON-файлах.
 
-Даты хранятся как строки ISO, при загрузке преобразуются в date.
+Преобразует JSON ↔ объекты классов User, Car, Policy.
 """
 
 import json
 import os
-from datetime import date
+
+from models.cars import Car
+from models.policies import Policy
+from models.users import User
+
+
+def _ensure_dir(filename: str) -> None:
+    """Создать папку для файла, если её нет."""
+    directory = os.path.dirname(filename)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
 
 # ---------- Пользователи ----------
-def load_users(filename: str) -> dict[int, dict]:
-    """Загрузить пользователей из JSON. Ключ — ID (int)."""
-    if not os.path.exists(filename):
-        return {}
-    try:
-        with open(filename, "r", encoding="utf-8") as file:
-            data = json.load(file)
-    except (json.JSONDecodeError, OSError):
-        return {}
-    return {int(k): v for k, v in data.items()}
-
-
-def save_users(filename: str, users: dict[int, dict]) -> None:
-    """Сохранить пользователей в JSON."""
-    _ensure_dir(filename)
-    try:
-        with open(filename, "w", encoding="utf-8") as file:
-            json.dump(users, file, ensure_ascii=False, indent=2)
-    except OSError as error:
-        print(f"[ERROR] Не удалось сохранить {filename}: {error}")
-
-
-# ---------- Автомобили ----------
-def load_cars(filename: str) -> dict[int, dict]:
-    """Загрузить автомобили из JSON."""
-    if not os.path.exists(filename):
-        return {}
-    try:
-        with open(filename, "r", encoding="utf-8") as file:
-            data = json.load(file)
-    except (json.JSONDecodeError, OSError):
-        return {}
-    return {int(k): v for k, v in data.items()}
-
-
-def save_cars(filename: str, cars: dict[int, dict]) -> None:
-    """Сохранить автомобили в JSON."""
-    _ensure_dir(filename)
-    try:
-        with open(filename, "w", encoding="utf-8") as file:
-            json.dump(cars, file, ensure_ascii=False, indent=2)
-    except OSError as error:
-        print(f"[ERROR] Не удалось сохранить {filename}: {error}")
-
-
-# ---------- Полисы ----------
-def _date_to_str(policy: dict) -> dict:
-    """Преобразовать даты в строки для JSON."""
-    item = policy.copy()
-    for field in ("start_date", "end_date"):
-        if isinstance(item.get(field), date):
-            item[field] = item[field].isoformat()
-    return item
-
-
-def _str_to_date(policy: dict) -> dict:
-    """Преобразовать строки обратно в date."""
-    item = policy.copy()
-    for field in ("start_date", "end_date"):
-        if isinstance(item.get(field), str):
-            try:
-                item[field] = date.fromisoformat(item[field])
-            except ValueError:
-                pass
-    return item
-
-
-def load_policies(filename: str) -> list[dict]:
-    """Загрузить список полисов из JSON."""
+def load_users(filename: str) -> list[User]:
+    """Загрузить пользователей из JSON."""
     if not os.path.exists(filename):
         return []
     try:
@@ -87,16 +30,16 @@ def load_policies(filename: str) -> list[dict]:
         return []
     if not isinstance(data, list):
         return []
-    return [_str_to_date(p) for p in data]
+    return [User.from_data(item) for item in data]
 
 
-def save_policies(filename: str, policies: list[dict]) -> None:
-    """Сохранить полисы в JSON."""
+def save_users(filename: str, users: list[User]) -> None:
+    """Сохранить пользователей в JSON."""
     _ensure_dir(filename)
     try:
         with open(filename, "w", encoding="utf-8") as file:
             json.dump(
-                [_date_to_str(p) for p in policies],
+                [u.to_data() for u in users],
                 file,
                 ensure_ascii=False,
                 indent=2,
@@ -105,8 +48,75 @@ def save_policies(filename: str, policies: list[dict]) -> None:
         print(f"[ERROR] Не удалось сохранить {filename}: {error}")
 
 
-def _ensure_dir(filename: str) -> None:
-    """Создать папку для файла, если её нет."""
-    directory = os.path.dirname(filename)
-    if directory:
-        os.makedirs(directory, exist_ok=True)
+# ---------- Автомобили ----------
+def load_cars(filename: str, users: list[User]) -> list[Car]:
+    """Загрузить автомобили из JSON."""
+    if not os.path.exists(filename):
+        return []
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (json.JSONDecodeError, OSError):
+        return []
+    if not isinstance(data, list):
+        return []
+    result = []
+    for item in data:
+        car = Car.from_data(item, users)
+        if car is not None:
+            result.append(car)
+    return result
+
+
+def save_cars(filename: str, cars: list[Car]) -> None:
+    """Сохранить автомобили в JSON."""
+    _ensure_dir(filename)
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+            json.dump(
+                [c.to_data() for c in cars],
+                file,
+                ensure_ascii=False,
+                indent=2,
+            )
+    except OSError as error:
+        print(f"[ERROR] Не удалось сохранить {filename}: {error}")
+
+
+# ---------- Полисы ----------
+def load_policies(
+    filename: str,
+    users: list[User],
+    cars: list[Car],
+) -> list[Policy]:
+    """Загрузить полисы из JSON."""
+    if not os.path.exists(filename):
+        return []
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (json.JSONDecodeError, OSError):
+        return []
+    if not isinstance(data, list):
+        return []
+    result = []
+    for item in data:
+        policy = Policy.from_data(item, users, cars)
+        if policy is not None:
+            result.append(policy)
+    return result
+
+
+def save_policies(filename: str, policies: list[Policy]) -> None:
+    """Сохранить полисы в JSON."""
+    _ensure_dir(filename)
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+            json.dump(
+                [p.to_data() for p in policies],
+                file,
+                ensure_ascii=False,
+                indent=2,
+            )
+    except OSError as error:
+        print(f"[ERROR] Не удалось сохранить {filename}: {error}")
