@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "car_id": 1,
+    "company": "бетбум",
+    "policy_type": "ОСАГО",
+    "start_date": "2025-04-21",
+    "end_date": "2030-04-21",
+    "price": 6767.0
+  }
+]

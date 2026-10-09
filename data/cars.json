@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "id": 1,
+    "owner_id": 1,
+    "license_plate": "Х777АМ",
+    "model": "kia seed"
+  }
+]
