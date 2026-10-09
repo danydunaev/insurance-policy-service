@@ -1,0 +1,9 @@
+"""Маршруты приложения web_users."""
+
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.users_list, name="users_list"),
+]
