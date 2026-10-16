@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Пользователи — Страховые полисы{% endblock %}
+
+{% block content %}
+<h1>Пользователи</h1>
+
+{# Фильтр length — количество пользователей #}
+<p>Всего пользователей: {{ users|length }}</p>
+
+<ul class="list-group">
+    {% for user in users %}
+        <li class="list-group-item">
+            <strong>{{ user.full_name }}</strong> —
+            {{ user.phone }}, {{ user.email }}
+        </li>
+    {% empty %}
+        <li class="list-group-item">Список пользователей пуст.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
