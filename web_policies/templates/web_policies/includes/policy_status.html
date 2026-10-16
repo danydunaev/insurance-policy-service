@@ -1,0 +1,19 @@
+{# ============================================================ #}
+{# ВОПРОС ТАБЛИЦЫ №8 (оценивание): Условное отображение          #}
+{# ВОПРОС ТАБЛИЦЫ №11 (оценивание): {% include %}                #}
+{# Один фрагмент используется и в списке, и на странице детали.  #}
+{# ============================================================ #}
+
+{% if "истек" in policy.check_status %}
+    <span class="badge bg-danger booking-status booking-status-cancelled">
+        {{ policy.check_status }}
+    </span>
+{% elif "истекает" in policy.check_status %}
+    <span class="badge bg-warning text-dark booking-status">
+        {{ policy.check_status }}
+    </span>
+{% else %}
+    <span class="badge bg-success booking-status booking-status-active">
+        {{ policy.check_status }}
+    </span>
+{% endif %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Полисы — Страховые полисы{% endblock %}
+
+{% block content %}
+<h1>Полисы</h1>
+
+{# Фильтр length — количество полисов #}
+<p>Всего полисов: {{ policies|length }}</p>
+
+<ul class="list-group">
+    {% for policy in policies %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {# Динамический URL через {% url %} #}
+            <a href="{% url 'web_policies:policy_detail' policy.id %}">
+                {{ policy.user.full_name }} — {{ policy.car.license_plate }}
+                ({{ policy.policy_type }})
+            </a>
+            {# Включаемый шаблон статуса — один фрагмент для списка и карточки #}
+            {% include "web_policies/includes/policy_status.html" %}
+        </li>
+    {% empty %}
+        <li class="list-group-item">Список полисов пуст.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

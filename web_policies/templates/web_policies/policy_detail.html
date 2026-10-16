@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if policy %}Полис №{{ policy.id }} — Страховые полисы{% else %}Полис не найден{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if policy %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Полис №{{ policy.id }}</h5>
+                <p class="card-text">
+                    <strong>Владелец:</strong> {{ policy.user.full_name }}
+                </p>
+                <p class="card-text">
+                    <strong>Автомобиль:</strong>
+                    {{ policy.car.license_plate }} ({{ policy.car.model }})
+                </p>
+                <p class="card-text">
+                    <strong>Компания:</strong> {{ policy.company }}
+                </p>
+                <p class="card-text">
+                    <strong>Тип:</strong> {{ policy.policy_type }}
+                </p>
+                <p class="card-text">
+                    <strong>Период:</strong>
+                    {{ policy.start_date }} — {{ policy.end_date }}
+                </p>
+                <p class="card-text">
+                    <strong>Стоимость:</strong>
+                    {# Фильтр floatformat — 2 знака после запятой #}
+                    {{ policy.price|floatformat:2 }} руб.
+                </p>
+                <p class="card-text">
+                    <strong>Статус:</strong>
+                    {% include "web_policies/includes/policy_status.html" %}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <h1 class="text-danger">Полис не найден</h1>
+        <p>Полис с указанным идентификатором отсутствует.</p>
+    {% endif %}
+
+    <a href="{% url 'web_policies:policies_list' %}"
+       class="btn btn-outline-secondary mt-3">
+        ← к списку полисов
+    </a>
+{% endblock %}
