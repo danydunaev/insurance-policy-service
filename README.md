@@ -1,6 +1,6 @@
 # Сервис учёта страховых полисов
 
-Приложение на Python для автоматизации учёта страховых полисов клиентов страховой компании. Изначально — консольное приложение (ПР1–ПР3), на ПР5 дополнено **веб-интерфейсом на Django**.
+Приложение на Python для автоматизации учёта страховых полисов клиентов страховой компании. Изначально — консольное приложение (ПР1–ПР3), на ПР5 дополнено **веб-интерфейсом на Django**, на ПР6 веб-интерфейс **переведён на систему шаблонов Django**.
 
 ## Назначение
 
@@ -18,11 +18,14 @@
 
 - **Python 3.10+** — язык программирования;
 - **Django 5.2** — веб-фреймворк;
-- **HTML** — разметка веб-страниц;
-- **CSS и Bootstrap 5.3** — оформление страниц;
+- **Django Template Language (DTL)** — система шаблонов;
+- **HTML5** — разметка веб-страниц;
+- **CSS3 и Bootstrap 5.3** — оформление страниц;
+- **JavaScript** — динамическое поведение интерфейса;
 - **JSON** — формат хранения данных;
 - **pytest** — автоматизированные тесты;
-- **flake8** — проверка качества кода.
+- **flake8** — проверка качества кода;
+- **Git** — контроль версий.
 
 ## Целевая аудитория
 
@@ -81,9 +84,11 @@ policy.user.full_name      # ФИО владельца
 policy.car.license_plate   # госномер авто
 ```
 
-## Веб-интерфейс (Django, ПР5)
+---
 
-На ПР5 к консольному приложению добавлен **веб-интерфейс на Django**. Он использует те же классы и функции, что и консольная версия, — предметная логика ПР3 сохранена.
+## Веб-интерфейс (Django)
+
+Веб-часть приложения реализована на Django и **на ПР6 переведена на систему шаблонов Django**. Предметная логика ПР3 сохранена; источник данных — JSON-файлы.
 
 ### Django-проект и приложения
 
@@ -94,13 +99,13 @@ policy.car.license_plate   # госномер авто
 
 ### Страницы веб-интерфейса
 
-| URL | Страница | View-функция |
-|-----|----------|--------------|
-| `/` | Главная страница с навигацией | `homepage.views.index()` |
-| `/users/` | Список пользователей | `web_users.views.users_list()` |
-| `/policies/` | Список полисов | `web_policies.views.policies_list()` |
-| `/policies/<int:policy_id>/` | Карточка полиса | `web_policies.views.policy_detail()` |
-| любой несуществующий | Собственная страница 404 | `homepage.views.page_not_found()` |
+| URL | Страница | View-функция | Шаблон |
+|-----|----------|--------------|--------|
+| `/` | Главная страница с навигацией | `homepage.views.index()` | `homepage/index.html` |
+| `/users/` | Список пользователей | `web_users.views.users_list()` | `web_users/users_list.html` |
+| `/policies/` | Список полисов | `web_policies.views.policies_list()` | `web_policies/policy_list.html` |
+| `/policies/<int:policy_id>/` | Карточка полиса | `web_policies.views.policy_detail()` | `web_policies/policy_detail.html` |
+| любой несуществующий | Собственная страница 404 | `homepage.views.page_not_found()` | `homepage/404.html` |
 
 ### Что реализовано в вебе (ПР5)
 
@@ -109,11 +114,34 @@ policy.car.license_plate   # госномер авто
 - ✅ Список полисов с цветными бейджами статуса (активен / истекает / истёк).
 - ✅ Карточка полиса с полной информацией.
 - ✅ Собственная страница 404.
-- ✅ Общий HTML-каркас (`page()`) с Bootstrap 5.3.
+
+### Что добавлено в вебе на ПР6
+
+Веб-интерфейс переведён с формирования HTML-строк в Python-коде на **систему шаблонов Django**:
+
+- ✅ **Базовый шаблон** `templates/base.html` с общей структурой страницы.
+- ✅ **Наследование шаблонов** через `{% extends %}` и блоки `{% block title %}` / `{% block content %}`.
+- ✅ **Включаемые шаблоны** `{% include %}`:
+  - `templates/includes/navigation.html` — общая навигация;
+  - `web_policies/includes/policy_status.html` — фрагмент статуса полиса (используется и в списке, и в карточке).
+- ✅ **Передача данных через контекст** `context` в `render()`.
+- ✅ **Циклы** `{% for %}` и обработка пустых коллекций `{% empty %}`.
+- ✅ **Условные конструкции** `{% if %}` / `{% elif %}` / `{% else %}` для статуса полиса.
+- ✅ **Именованные URL** `{% url %}` и **пространства имён** (`homepage:index`, `web_users:users_list`, `web_policies:policy_detail`).
+- ✅ **Фильтры шаблонов**: `|length`, `|floatformat:2`.
+- ✅ **Статические файлы**:
+  - `{% load static %}` и `{% static %}`;
+  - собственный CSS `homepage/static/homepage/css/style.css`;
+  - собственный JS `homepage/static/homepage/js/main.js`;
+  - логотип `homepage/static/homepage/img/logo.png`.
+- ✅ **Собственное оформление** поверх Bootstrap (классы `.room-card`, `.booking-status`, `.roomly-logo`).
+- ✅ **Отказ от функции `page()`** — HTML больше не формируется в Python-коде веб-представлений.
 
 ### Что отложено на следующие ПР
 
 Операции, требующие форм и POST-запросов (добавление, редактирование, поиск, фильтрация), **пока остаются только в консольной версии**. Они будут перенесены в веб после изучения Django Forms и Django ORM.
+
+---
 
 ## Возможности приложения
 
@@ -135,6 +163,9 @@ policy.car.license_plate   # госномер авто
 - Просмотр карточки конкретного полиса.
 - Навигация между разделами.
 - Обработка ошибки 404.
+- Отображение текущего года в подвале через JS.
+
+---
 
 ## Структура проекта
 
@@ -152,6 +183,11 @@ insurance-policy-service/
 │   ├── asgi.py
 │   └── wsgi.py
 │
+├── templates/                   # ШАБЛОНЫ УРОВНЯ ПРОЕКТА (ПР6)
+│   ├── base.html                # базовый шаблон
+│   └── includes/
+│       └── navigation.html      # общая навигация
+│
 ├── homepage/                    # Django-приложение «главная»
 │   ├── __init__.py
 │   ├── admin.py
@@ -160,7 +196,19 @@ insurance-policy-service/
 │   ├── models.py
 │   ├── tests.py
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   ├── templates/
+│   │   └── homepage/
+│   │       ├── index.html       # главная страница
+│   │       └── 404.html         # собственная страница 404
+│   └── static/
+│       └── homepage/
+│           ├── css/
+│           │   └── style.css    # собственный CSS
+│           ├── js/
+│           │   └── main.js      # собственный JavaScript
+│           └── img/
+│               └── logo.png     # логотип
 │
 ├── web_users/                   # Django-приложение «пользователи»
 │   ├── __init__.py
@@ -170,7 +218,10 @@ insurance-policy-service/
 │   ├── models.py
 │   ├── tests.py
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   └── templates/
+│       └── web_users/
+│           └── users_list.html  # список пользователей
 │
 ├── web_policies/                # Django-приложение «полисы»
 │   ├── __init__.py
@@ -180,7 +231,13 @@ insurance-policy-service/
 │   ├── models.py
 │   ├── tests.py
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
+│   └── templates/
+│       └── web_policies/
+│           ├── policy_list.html     # список полисов
+│           ├── policy_detail.html   # карточка полиса
+│           └── includes/
+│               └── policy_status.html  # фрагмент статуса
 │
 ├── models/                      # классы предметной области (ПР3)
 │   ├── __init__.py
@@ -205,6 +262,8 @@ insurance-policy-service/
 └── README.md
 ```
 
+---
+
 ## Назначение модулей
 
 ### Консольная часть (ПР3)
@@ -216,13 +275,26 @@ insurance-policy-service/
 - **`storage.py`** — загрузка и сохранение данных (JSON ↔ объекты).
 - **`utils.py`** — функции безопасного ввода.
 
-### Веб-часть (ПР5)
+### Веб-часть (ПР5–ПР6)
 
-- **`insurance/settings.py`** — настройки Django (язык, часовой пояс, приложения).
+- **`insurance/settings.py`** — настройки Django: приложения, шаблоны (`DIRS`), статика, язык, часовой пояс.
 - **`insurance/urls.py`** — корневая маршрутизация, обработчик 404.
-- **`homepage/views.py`** — функции `page()` (общий HTML-каркас), `index()`, `page_not_found()`.
-- **`web_users/views.py`** — функция `users_list()` — список пользователей.
+- **`homepage/views.py`** — функции `index()` и `page_not_found()`.
+- **`web_users/views.py`** — функция `users_list()`.
 - **`web_policies/views.py`** — функции `policies_list()` и `policy_detail()`.
+
+### Шаблоны (ПР6)
+
+- **`templates/base.html`** — общая HTML-структура: `<head>`, подключение CSS, навигация, подвал, блоки `title` и `content`.
+- **`templates/includes/navigation.html`** — общая навигация (используется через `{% include %}`).
+- **`homepage/templates/homepage/index.html`** — главная страница.
+- **`homepage/templates/homepage/404.html`** — страница 404.
+- **`web_users/templates/web_users/users_list.html`** — список пользователей.
+- **`web_policies/templates/web_policies/policy_list.html`** — список полисов.
+- **`web_policies/templates/web_policies/policy_detail.html`** — карточка полиса.
+- **`web_policies/templates/web_policies/includes/policy_status.html`** — фрагмент статуса полиса (включается в двух шаблонах).
+
+---
 
 ## Формат хранения данных
 
@@ -272,6 +344,8 @@ insurance-policy-service/
 ```
 
 В файле `policies.json` хранятся **идентификаторы** (`user_id`, `car_id`), а не сами объекты. При загрузке программа восстанавливает связи между объектами.
+
+---
 
 ## Требования
 
@@ -324,6 +398,16 @@ flake8
 
 Если замечаний нет — команда не выводит ничего. Каталог `venv/` исключён из проверки через `.flake8`.
 
+## Проверка конфигурации Django
+
+```bash
+python manage.py check
+```
+
+Должно вывести: `System check identified no issues (0 silenced).`
+
+---
+
 ## Использованные возможности Python
 
 - **Классы и объекты** — `User`, `Car`, `Policy`.
@@ -341,6 +425,8 @@ flake8
 
 ## Использованные возможности Django
 
+### Базовые (ПР5)
+
 - **Django-проект** и **Django-приложения**.
 - **Маршрутизация URL** двух уровней (`include()`).
 - **View-функции** — обработка HTTP-запросов.
@@ -350,13 +436,32 @@ flake8
 - **HTML + Bootstrap 5.3** — оформление страниц.
 - **Навигация** между страницами.
 
+### Django Template Language (ПР6)
+
+- **Базовый шаблон** `base.html`.
+- **Наследование шаблонов**: `{% extends "base.html" %}`.
+- **Блоки**: `{% block title %}`, `{% block content %}`.
+- **Включаемые шаблоны**: `{% include "..." %}`.
+- **Передача данных через контекст**: `render(request, "...", context)`.
+- **Вывод значений**: `{{ policy.id }}`, `{{ policy.user.full_name }}`.
+- **Условия**: `{% if %}`, `{% elif %}`, `{% else %}`, `{% endif %}`.
+- **Циклы**: `{% for %}`, `{% empty %}`, `{% endfor %}`.
+- **Именованные URL**: `{% url 'web_policies:policy_detail' policy.id %}`.
+- **Пространства имён**: `app_name = 'web_policies'`.
+- **Фильтры**: `|length`, `|floatformat:2`.
+- **Статические файлы**: `{% load static %}`, `{% static '...' %}`.
+
+---
+
 ## План развития
 
-- **ПР6:** Django ORM, база данных (вместо JSON).
-- **ПР7:** формы, добавление и редактирование через веб.
-- **ПР8:** аутентификация пользователей.
-- **ПР9:** REST API с Django REST Framework.
-- **ПР10:** Docker и CI/CD.
+- **ПР6:** Django ORM, база данных (вместо JSON). ✅ *Заменено на Django Templates (по заданию)*
+- **ПР7:** Django ORM и база данных.
+- **ПР8:** формы, добавление и редактирование через веб.
+- **ПР9:** аутентификация пользователей.
+- **ПР10:** REST API с Django REST Framework.
+
+---
 
 ## Статус выполнения
 
@@ -364,8 +469,9 @@ flake8
 - [x] ПР2. Коллекции, модули, JSON, тесты
 - [x] ПР3. Объектно-ориентированная модель
 - [x] ПР5. Django: HTTP, URL, view, веб-страницы
-- [ ] ПР6. Django ORM и база данных
-- [ ] ПР7. Формы и редактирование
-- [ ] ПР8. Аутентификация
-- [ ] ПР9. REST API
-- [ ] ПР10. Docker и CI/CD
+- [x] ПР6. Django Templates: base.html, extends, include, контекст, циклы, условия, фильтры, именованные URL, static-файлы
+- [ ] ПР7. Django ORM и база данных
+- [ ] ПР8. Формы и редактирование
+- [ ] ПР9. Аутентификация
+- [ ] ПР10. REST API
+```
