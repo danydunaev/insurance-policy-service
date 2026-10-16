@@ -1,0 +1,17 @@
+{# Главная страница. Наследует base.html, переопределяет блоки. #}
+{% extends "base.html" %}
+
+{% block title %}Главная — Страховые полисы{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Сервис учёта страховых полисов</h1>
+<p class="lead">Система автоматизации работы страхового агента.</p>
+
+<p>Основные разделы:</p>
+<a href="{% url 'web_users:users_list' %}" class="btn btn-primary me-2">
+    Пользователи
+</a>
+<a href="{% url 'web_policies:policies_list' %}" class="btn btn-secondary">
+    Полисы
+</a>
+{% endblock %}

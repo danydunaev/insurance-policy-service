@@ -1,65 +1,39 @@
-"""View-функции главной страницы проекта."""
+"""
+View-функции приложения homepage.
+ПР6: HTML вынесен в шаблоны, функция page() больше не используется.
+"""
 
-from django.http import HttpResponse
+from django.shortcuts import render
+
+# ============================================================
+# ВОПРОС ТАБЛИЦЫ №9: Обработка HTTP-запроса
+# Путь GET /:
+#   1. ROOT_URLCONF (insurance/urls.py) видит '' → include('homepage.urls')
+#   2. homepage/urls.py сопоставляет '' с views.index
+#   3. index(request) вызывается
+#   4. index() возвращает render(request, 'homepage/index.html')
+#   5. render() формирует HttpResponse с HTML
+#   6. Django отдаёт HttpResponse браузеру
+#
+# ВОПРОС ТАБЛИЦЫ №10: Взаимодействие запроса и представления
+# request — HttpRequest, создаётся Django, передаётся первым аргументом.
+# Возвращать нужно HttpResponse (или его подкласс).
+# Если вернуть str, будет AttributeError: 'str' object has no attribute 'get'.
+# ============================================================
 
 
-def page(title: str, content: str) -> str:
+def index(request):
     """
-    Собрать HTML-документ с единым каркасом.
+    Главная страница.
 
-    :param title: заголовок вкладки браузера
-    :param content: содержимое страницы
-    :return: HTML-строка
+    ВОПРОС ТАБЛИЦЫ №11: Формирование HTML-страницы
+    Было (ПР5): content = "..." → page() → HttpResponse
+    Стало (ПР6): render() → homepage/index.html → base.html
+    HTML формируется шаблоном, а не Python-кодом.
     """
-    bootstrap_css = (
-        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/"
-        "dist/css/bootstrap.min.css"
-    )
-    return f"""<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{title}</title>
-    <link href="{bootstrap_css}" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">Сервис страховых полисов</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/users/">Пользователи</a>
-                <a class="nav-link" href="/policies/">Полисы</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container">
-        {content}
-    </div>
-</body>
-</html>"""
+    return render(request, 'homepage/index.html')
 
 
-def index(request) -> HttpResponse:
-    """Главная страница проекта."""
-    content = """
-    <h1 class="display-4">Сервис учёта страховых полисов</h1>
-    <p class="lead">Консольное приложение, дополненное веб-интерфейсом.</p>
-    <p>Основные разделы:</p>
-    <a href="/users/" class="btn btn-primary me-2">Пользователи</a>
-    <a href="/policies/" class="btn btn-secondary">Полисы</a>
-    """
-    return HttpResponse(page("Главная", content))
-
-
-def page_not_found(request, exception) -> HttpResponse:
-    """Обработчик ошибки 404 — собственная страница проекта."""
-    content = """
-    <h1 class="text-danger">404 — страница не найдена</h1>
-    <p>Проверьте адрес или вернитесь на главную.</p>
-    <a href="/" class="btn btn-primary">На главную</a>
-    """
-    return HttpResponse(
-        page("404 — страница не найдена", content),
-        status=404,
-    )
+def page_not_found(request, exception):
+    """Собственная страница 404."""
+    return render(request, 'homepage/404.html', status=404)

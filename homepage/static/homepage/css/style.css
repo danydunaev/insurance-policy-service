@@ -1,0 +1,34 @@
+/* ============================================================
+   ВОПРОС ТАБЛИЦЫ №21 (оценивание): Изменение стилей страницы
+   HTML-класс (например, room-card) сопоставляется с CSS-селектором
+   .room-card — браузер применяет правила.
+   ============================================================ */
+
+body {
+    min-height: 100vh;
+}
+
+.room-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.booking-status {
+    font-weight: 600;
+}
+
+.booking-status-cancelled {
+    text-decoration: line-through;
+}
+
+.booking-status-active {
+    color: #198754;
+}
+
+.roomly-logo {
+    width: 120px;
+    height: auto;
+    margin: 1rem 0;
+}
